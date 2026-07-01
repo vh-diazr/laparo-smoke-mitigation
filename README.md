@@ -7,7 +7,7 @@
 ¹ Instituto Politécnico Nacional – CITEDI, Tijuana, Mexico
 ² Tecnológico Nacional de México / IT Tijuana, Tijuana, Mexico
 
-This repository provides the model architecture, physics-based smoke simulation, training pipeline, and evaluation code associated with the manuscript. Representative degraded laparoscopic sequences are included under `evaluation/samples/` to enable immediate inference without requiring access to the full dataset.
+This repository provides the model architecture, physics-based smoke simulation, training workflow, and evaluation code associated with the manuscript. Representative degraded laparoscopic sequences are included under `evaluation/samples/` to enable immediate inference without requiring access to the full dataset.
 
 ---
 

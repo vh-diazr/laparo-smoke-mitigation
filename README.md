@@ -20,7 +20,8 @@ laparo-smoke-mitigation/
 ├── model/
 │   └── hybrid_cnn_vit.py          ← Hybrid CNN-ViT architecture
 ├── simulation/
-│   └── smoke_simulation.py        ← Navier-Stokes surgical smoke simulation
+│   ├── smoke_simulation.py        ← Navier-Stokes surgical smoke simulation
+│   └── apply_smoke_degradation.py ← Atmospheric scattering degradation of reference video
 ├── dataset/
 │   └── build_dataset.py           ← Synthetic dataset construction pipeline
 ├── training/

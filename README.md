@@ -29,9 +29,9 @@ laparo-smoke-mitigation/
 ├── evaluation/
 │   ├── evaluate.py                ← Inference and quantitative evaluation
 │   └── samples/
-│       ├── seq_01/                ← Synthetic smoke: dense localized distribution
-│       ├── seq_02/                ← Synthetic smoke: diffuse spatial distribution
-│       └── seq_03/                ← Real electrocautery smoke (Cholec80)
+│       ├── seq_01/                ← Synthetic smoke-degraded laparoscopic sequence
+│       ├── seq_02/                ← Synthetic smoke-degraded laparoscopic sequence
+│       └── seq_03/                ← Synthetic smoke-degraded laparoscopic sequence
 └── weights/
     └── model_weights.pth          ← Pre-trained model weights
 ```

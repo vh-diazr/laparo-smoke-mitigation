@@ -7,7 +7,7 @@
 ¹ Instituto Politécnico Nacional – CITEDI, Tijuana, Mexico
 ² Tecnológico Nacional de México / IT Tijuana, Tijuana, Mexico
 
-This repository provides the model architecture, physics-based smoke simulation, training workflow, and evaluation code associated with the manuscript. Representative degraded laparoscopic sequences are included under `evaluation/samples/` to enable immediate inference without requiring access to the full dataset.
+This repository provides the model architecture, physics-based smoke simulation, training pipeline, and evaluation code associated with the manuscript. Representative degraded laparoscopic sequences are included under `evaluation/samples/` to enable immediate inference without requiring access to the full dataset.
 
 ---
 
@@ -58,7 +58,7 @@ where `f(x,y)` is the degraded observation, `J(x,y)` is the latent smoke-free ra
 
 The model jointly estimates `T̂` and `Â` from the degraded input frame. The CNN encoder extracts hierarchical local features via four strided convolutional stages (channel widths: 32→64→128→`embed_dim`), progressively downsampling spatial resolution by a factor of 16. The resulting feature map is flattened into a sequence of tokens and processed by a Vision Transformer (ViT) encoder comprising `L` layers of multi-head self-attention (MHSA) with learned positional embeddings, capturing long-range spatial dependencies across the full spatial extent of the degraded image. The CNN decoder reconstructs the full-resolution transmission map via transposed convolutions with skip connections from the encoder. A parallel ambient light estimation head applies global average pooling over the bottleneck feature map followed by a 1×1 convolution and sigmoid activation, producing per-channel estimates `Â ∈ [0,1]³`.
 
-Key architectural parameters: `embed_dim = 128`, `num_layers = 2`, `num_heads = 8`, input resolution `480 × 512`.
+Key architectural parameters: `embed_dim = 256`, `num_layers = 4`, `num_heads = 8`, input resolution `480 × 512`.
 
 ---
 

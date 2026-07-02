@@ -186,8 +186,10 @@ def restore_frame(
     trans_map    : np.ndarray, shape (H, W), dtype float32
         Refined transmission map T̂(x,y) at original resolution, values in [t_min, 1].
     A_scalar     : float
-        Luminance-equivalent ambient light scalar in [0, 255], derived from
-        the per-channel estimate via ITU-R BT.601 coefficients.
+        Estimated ambient light scalar Â in [0, 255]. The A_head produces a
+        single wavelength-independent value enforcing A_R = A_G = A_B,
+        consistent with the scalar airlight assumption used during dataset
+        construction (apply_smoke_degradation.py).
     """
     H_orig, W_orig = img_bgr.shape[:2]
 
@@ -216,24 +218,18 @@ def restore_frame(
     )
     trans_full = np.clip(trans_full, t_min, 1.0)
 
-    # Per-channel ambient light vector Â ∈ [0,1]³ → scaled to [0,255]
-    A_rgb = A_pred[0].cpu().numpy()               # (3,) in [0, 1]
-    A_ch  = (A_rgb * 255.0).astype(np.float32)   # (3,) in [0, 255]
+    # Ambient light scalar Â ∈ [0,1] → scaled to [0,255]
+    # The A_head outputs a single wavelength-independent scalar enforcing the
+    # assumption A_R = A_G = A_B, consistent with the dataset construction
+    # protocol in apply_smoke_degradation.py (scalar airlight parameter).
+    # The model forward pass expands this scalar to (B,3) via A.expand(-1,3).
+    A_scalar = float(A_pred[0, 0].cpu().item()) * 255.0
 
-    # Report luminance-equivalent scalar for logging (ITU-R BT.601)
-    A_scalar = float(0.299 * A_ch[0] + 0.587 * A_ch[1] + 0.114 * A_ch[2])
-
-    # (iv) Per-channel atmospheric scattering inversion
-    # J_c = (I_c - A_c) / max(T, t_min) + A_c,  c ∈ {R, G, B}
-    # This applies the full 3-channel ambient light estimate independently
-    # per colour channel, consistent with the wavelength-dependent scattering
-    # characteristics of real electrocautery smoke.
-    I_f      = img_bgr.astype(np.float32)         # BGR, [0, 255]
-    T_f      = trans_full[:, :, np.newaxis]        # (H, W, 1) — broadcast
-    # Note: img_bgr is BGR; A_ch is indexed as [R, G, B] from model output.
-    # Reorder A_ch to BGR for channel-wise subtraction.
-    A_bgr    = A_ch[[2, 1, 0]]                    # RGB → BGR reordering
-    restored = (I_f - A_bgr) / T_f + A_bgr
+    # (iv) Atmospheric scattering inversion (wavelength-independent airlight)
+    #   Ĵ(x,y) = (f(x,y) - Â) / max(T̂(x,y), t_min) + Â
+    I_f          = img_bgr.astype(np.float32)
+    T_f          = trans_full[:, :, np.newaxis]     # broadcast over channels
+    restored     = (I_f - A_scalar) / T_f + A_scalar
     restored_bgr = np.clip(restored, 0.0, 255.0).astype(np.uint8)
 
     return restored_bgr, trans_full, A_scalar
@@ -445,9 +441,9 @@ def parse_args() -> argparse.Namespace:
                         help="Training input height (pixels).")
     parser.add_argument("--train_w",    type=int,   default=512,
                         help="Training input width (pixels).")
-    parser.add_argument("--embed_dim",  type=int,   default=128,
+    parser.add_argument("--embed_dim",  type=int,   default=256,
                         help="Transformer embedding dimension.")
-    parser.add_argument("--num_layers", type=int,   default=2,
+    parser.add_argument("--num_layers", type=int,   default=4,
                         help="Number of Transformer encoder layers.")
     parser.add_argument("--num_heads",  type=int,   default=8,
                         help="Number of multi-head self-attention heads.")

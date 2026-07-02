@@ -42,13 +42,13 @@ laparo-smoke-mitigation/
 
 ### Physical Image Formation Model
 
-Laparoscopic smoke degradation is modelled via the atmospheric scattering equation:
+Laparoscopic smoke degradation is modelled through the atmospheric scattering equation:
 
 ```
 f(x,y) = J(x,y) · T(x,y) + A · (1 - T(x,y))
 ```
 
-where `f(x,y)` is the degraded observation, `J(x,y)` is the latent smoke-free radiance field, `T(x,y) ∈ [0,1]` is the spatially varying transmission map, and `A ∈ ℝ³` is the per-channel ambient light vector. Smoke-free image recovery is performed by inverting this model given the network estimates `(T̂, Â)`:
+where `f(x,y)` is the degraded observation, `J(x,y)` is the smoke-free reflectance field, `T(x,y) ∈ [0,1]` is the spatially varying transmission map, and `A ∈ ℝ³` is the per-channel ambient light vector. Smoke-free image recovery is performed by inverting this model given the network estimates `(T̂, Â)`:
 
 ```
 Ĵ(x,y) = (f(x,y) - Â) / max(T̂(x,y), ε) + Â,   ε = 0.05
@@ -56,7 +56,7 @@ where `f(x,y)` is the degraded observation, `J(x,y)` is the latent smoke-free ra
 
 ### Hybrid CNN-ViT Architecture
 
-The model jointly estimates `T̂` and `Â` from the degraded input frame. The CNN encoder extracts hierarchical local features via four strided convolutional stages (channel widths: 32→64→128→`embed_dim`), progressively downsampling spatial resolution by a factor of 16. The resulting feature map is flattened into a sequence of tokens and processed by a Vision Transformer (ViT) encoder comprising `L` layers of multi-head self-attention (MHSA) with learned positional embeddings, capturing long-range spatial dependencies across the full spatial extent of the degraded image. The CNN decoder reconstructs the full-resolution transmission map via transposed convolutions with skip connections from the encoder. A parallel ambient light estimation head applies global average pooling over the bottleneck feature map followed by a 1×1 convolution and sigmoid activation, producing per-channel estimates `Â ∈ [0,1]³`.
+The model jointly estimates `T̂` and `Â` from the degraded input frame. The CNN encoder extracts hierarchical local features through four strided convolutional stages (channel widths: 32→64→128→`embed_dim`), progressively downsampling spatial resolution by a factor of 16. The resulting feature map is flattened into a sequence of tokens and processed by a Vision Transformer (ViT) encoder composed of `L` layers of multi-head self-attention (MHSA) with learned positional embeddings, capturing long-range spatial dependencies across the full spatial extent of the degraded image. The CNN decoder reconstructs the full-resolution transmission map through transposed convolutions with skip connections from the encoder. A parallel ambient light estimation head applies global average pooling over the bottleneck feature map followed by a 1×1 convolution and sigmoid activation, producing per-channel estimates `Â ∈ [0,1]³`.
 
 Key architectural parameters: `embed_dim = 256`, `num_layers = 4`, `num_heads = 8`, input resolution `480 × 512`.
 

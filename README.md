@@ -1,6 +1,6 @@
 # Nonhomogeneous Smoke Mitigation in Laparoscopic Images Using a Hybrid Physical-Neural Model
 
-**Manuscript under minor revision** — *Medical & Biological Engineering & Computing* (MBEC), Springer Nature.
+**Manuscript accepted* — *Medical & Biological Engineering & Computing* (MBEC), Springer Nature.
 
 **Authors:** Victor Diaz-Ramirez¹, Jose Godoy¹, Christian Gaxiola¹, Rigoberto Juarez-Salazar¹, Leonardo Trujillo²
 
